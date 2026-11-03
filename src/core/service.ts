@@ -108,7 +108,7 @@ export class AppService {
 
   async getNetworkSetup(network: NetworkId): Promise<NetworkSetup> {
     const [cred, settings] = await Promise.all([this.store.getCredentials(network), this.store.getSettings()])
-    const def = defaultRedirectUri(network, settings)
+    const def = this.redirectUri(network, settings)
     return { network, clientId: cred?.clientId ?? '', hasSecret: !!cred?.clientSecret, redirectUri: cred?.redirectUri || def, defaultRedirectUri: def }
   }
 
@@ -128,12 +128,17 @@ export class AppService {
     await this.updateSettings({ configuredNetworks: [...configured] })
   }
 
+  /** Desktop uses a loopback server; mobile returns to the app through its deep link. */
+  private redirectUri(network: NetworkId, settings: Settings) {
+    return this.platform.name === 'mobile' ? 'com.socialhub.app://oauth' : defaultRedirectUri(network, settings)
+  }
+
   async connect(network: NetworkId): Promise<Account[]> {
     const connector = connectors[network]
     const [cred, settings] = await Promise.all([this.store.getCredentials(network), this.store.getSettings()])
     if (!cred?.clientId) throw new Error(`Configure o app de desenvolvedor do ${connector.info.name} antes de conectar.`)
     if (connector.info.needsSecret && !cred.clientSecret) throw new Error(`O ${connector.info.name} exige o Client Secret.`)
-    const redirectUri = cred.redirectUri || defaultRedirectUri(network, settings)
+    const redirectUri = cred.redirectUri || this.redirectUri(network, settings)
     const token = await runOAuth(this.platform, connector.oauth(settings), cred, redirectUri)
     const found = await connector.discover(token, { platform: this.platform, settings, credentials: cred })
 

@@ -1,10 +1,35 @@
 {
   "appId": "com.socialhub.app",
   "productName": "Social Hub",
-  "directories": { "output": "release" },
-  "files": ["dist/**", "dist-electron/**"],
-  "win": { "target": ["nsis"] },
-  "mac": { "target": ["dmg"] },
-  "linux": { "target": ["AppImage"] },
-  "nsis": { "oneClick": false, "allowToChangeInstallationDirectory": true }
+  "copyright": "Copyright © 2026 Emerson Gonçalves",
+  "directories": { "output": "release/${version}", "buildResources": "build" },
+  "files": ["dist/**", "dist-electron/**", "package.json"],
+  "artifactName": "Social-Hub-${version}-${os}-${arch}.${ext}",
+  "win": {
+    "target": [{ "target": "nsis", "arch": ["x64", "arm64"] }],
+    "icon": "build/icon.png"
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "Social Hub"
+  },
+  "mac": {
+    "target": [{ "target": "dmg", "arch": ["x64", "arm64"] }],
+    "category": "public.app-category.social-networking",
+    "icon": "build/icon.png"
+  },
+  "linux": {
+    "target": [
+      { "target": "AppImage", "arch": ["x64"] },
+      { "target": "deb", "arch": ["x64"] }
+    ],
+    "category": "Network",
+    "icon": "build/icon.png",
+    "maintainer": "Emerson Gonçalves <esgboy@gmail.com>",
+    "synopsis": "Gerencie e agende suas redes sociais com IA e MCP"
+  }
 }

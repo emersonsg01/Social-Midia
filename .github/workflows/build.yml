@@ -1,0 +1,84 @@
+name: Instaladores
+
+# Manual run builds the installers as workflow artifacts.
+# Pushing a tag like v0.2.0 also publishes them in a GitHub Release.
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  desktop:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: Windows, os: windows-latest, flag: --win, files: 'release/*/*.exe' }
+          - { name: macOS, os: macos-latest, flag: --mac, files: 'release/*/*.dmg' }
+          - { name: Linux, os: ubuntu-latest, flag: --linux, files: "release/*/*.AppImage\nrelease/*/*.deb" }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npx electron-builder ${{ matrix.flag }} --publish never
+        env:
+          # No signing certificates configured: build unsigned installers.
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Social-Hub-${{ matrix.name }}
+          path: ${{ matrix.files }}
+          if-no-files-found: error
+
+  android:
+    name: Android
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      - run: npm run build:web
+      - run: npx cap sync android
+      - name: Build APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+      - run: |
+          mkdir -p out
+          cp android/app/build/outputs/apk/debug/app-debug.apk "out/Social-Hub-${GITHUB_REF_NAME//\//-}-android.apk"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Social-Hub-Android
+          path: out/*.apk
+          if-no-files-found: error
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [desktop, android]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*
+          generate_release_notes: true
