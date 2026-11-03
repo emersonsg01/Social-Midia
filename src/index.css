@@ -1,0 +1,120 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: 'Inter', 'Segoe UI Variable', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --color-accent: #7c5cff;
+  --color-accent-2: #22d3ee;
+}
+
+/* Semantic tokens; .light on <html> swaps them. */
+:root {
+  --bg: #0b0d12;
+  --panel: #12151d;
+  --panel-2: #181c26;
+  --border: #242936;
+  --text: #e6e8ee;
+  --muted: #8b91a1;
+  --hover: #1d2230;
+  color-scheme: dark;
+}
+:root.light {
+  --bg: #f4f5f9;
+  --panel: #ffffff;
+  --panel-2: #f7f8fb;
+  --border: #e3e6ee;
+  --text: #151821;
+  --muted: #646b7d;
+  --hover: #eef0f6;
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-panel-2: var(--panel-2);
+  --color-line: var(--border);
+  --color-fg: var(--text);
+  --color-muted: var(--muted);
+  --color-hover: var(--hover);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+.drag {
+  -webkit-app-region: drag;
+}
+.no-drag {
+  -webkit-app-region: no-drag;
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-in {
+  animation: fade-in 0.18s ease-out;
+}
+
+.prose-chat p {
+  margin: 0.35em 0;
+}
+.prose-chat pre {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  padding: 0.6em 0.8em;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 0.85em;
+}
+.prose-chat code {
+  font-size: 0.9em;
+}
+.prose-chat ul {
+  list-style: disc;
+  padding-left: 1.2em;
+}
+.prose-chat ol {
+  list-style: decimal;
+  padding-left: 1.2em;
+}

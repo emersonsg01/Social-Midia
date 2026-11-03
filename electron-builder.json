@@ -1,0 +1,10 @@
+{
+  "appId": "com.socialhub.app",
+  "productName": "Social Hub",
+  "directories": { "output": "release" },
+  "files": ["dist/**", "dist-electron/**"],
+  "win": { "target": ["nsis"] },
+  "mac": { "target": ["dmg"] },
+  "linux": { "target": ["AppImage"] },
+  "nsis": { "oneClick": false, "allowToChangeInstallationDirectory": true }
+}
