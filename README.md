@@ -10,8 +10,25 @@ App para **gerenciar, analisar e agendar publicações** no LinkedIn, Facebook, 
 ```bash
 npm install
 npm run dev        # abre o app em modo desenvolvimento
-npm run dist       # gera o instalador em release/
 ```
+
+## Instaladores
+
+| Sistema | Arquivo | Comando local |
+|---|---|---|
+| Windows (x64/ARM) | `Social-Hub-<versão>-win-x64.exe` / `-arm64.exe` | `npm run dist:win` |
+| macOS (Intel/Apple Silicon) | `Social-Hub-<versão>-mac-x64.dmg` / `-arm64.dmg` | `npm run dist:mac` (só num Mac) |
+| Linux | `.AppImage` e `.deb` | `npm run dist:linux` (só no Linux) |
+| Android | `Social-Hub-<versão>-android.apk` | `npm run android:apk` (requer Android SDK) |
+
+Os arquivos locais ficam em `release/<versão>/`. O workflow **Instaladores** do GitHub Actions gera os quatro na nuvem. Você pode rodá-lo manualmente em *Actions → Instaladores → Run workflow* e baixar os arquivos em *Artifacts*. Ao enviar uma tag (`git tag v0.2.0 && git push --tags`), ele também publica um **Release** com todos os instaladores.
+
+Os instaladores não são assinados digitalmente:
+- **Windows:** o SmartScreen avisa na primeira execução. Clique em *Mais informações → Executar assim mesmo*.
+- **macOS:** clique com o botão direito no app e escolha *Abrir*. Se o sistema disser que o app está "danificado", rode `xattr -cr "/Applications/Social Hub.app"`.
+- **Android:** o APK é de depuração. Permita "instalar apps desconhecidos". Para publicar na Play Store, é preciso gerar um AAB assinado com a sua keystore.
+
+Para mudar o ícone, edite `build/icon.svg` e rode `npm run icons`.
 
 ## Funções
 
